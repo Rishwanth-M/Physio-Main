@@ -11,7 +11,9 @@ const generateTreatmentHTML = require("./templates/treatmentTemplate");
 const generateBillHTML = require("./templates/billTemplate");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 app.use(express.json());
 
 // Supabase
@@ -25,7 +27,7 @@ app.post("/generate-pdf", async (req, res) => {
   try {
     const data = req.body;
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({   args: ["--no-sandbox", "--disable-setuid-sandbox"],   headless: "new" });
     const page = await browser.newPage();
 
     const html = generateHTML(data);
@@ -74,7 +76,7 @@ app.post("/register-and-generate-pdf", async (req, res) => {
     /* ---------- 2. GENERATE PDF ---------- */
     const html = generateHTML(data);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({   args: ["--no-sandbox", "--disable-setuid-sandbox"],   headless: "new" });
     const page = await browser.newPage();
 
     await page.setContent(html, { waitUntil: "networkidle0" });
@@ -202,7 +204,7 @@ app.post("/generate-bill-pdf", async (req, res) => {
       totalCost
     });
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({   args: ["--no-sandbox", "--disable-setuid-sandbox"],   headless: "new" });
     const page = await browser.newPage();
 
     await page.setContent(html, { waitUntil: "networkidle0" });
