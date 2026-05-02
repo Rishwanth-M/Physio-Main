@@ -1,0 +1,139 @@
+/* ===== ROOT ===== */
+:root {
+  --primary: #2563eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f9fafb;
+}
+
+/* ===== PAGE ===== */
+.bill-container {
+  width: 100%;
+  min-height: 100%;
+  padding: 24px;
+  background: var(--bg);
+  font-family: "Inter", sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* ✅ centers content */
+}
+
+/* ===== TITLE ===== */
+.bill-container h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 16px;
+
+  text-align: center;   /* ✅ center text */
+  width: 100%;
+}
+/* ===== CARD ===== */
+.bill-card {
+  width: 100%;          /* ✅ important */
+  max-width: 600px;
+
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* ===== INPUT ===== */
+.bill-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+/* ===== RESULTS ===== */
+.bill-results {
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* ITEM */
+.bill-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.bill-item:hover {
+  background: #f3f4f6;
+}
+
+/* ===== INFO ===== */
+.bill-info {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+/* ROW */
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.bill-row:last-child {
+  border-bottom: none;
+}
+
+/* LABEL */
+.bill-row b {
+  color: #1e3a8a;
+}
+
+/* VALUE */
+.bill-value {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ===== BUTTON ===== */
+.bill-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.bill-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .bill-container {
+    padding: 14px;
+  }
+
+  .bill-card {
+    padding: 14px;
+  }
+
+  .bill-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+}

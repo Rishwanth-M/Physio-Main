@@ -1,0 +1,147 @@
+/* ===== ROOT ===== */
+:root {
+  --primary: #2563eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+}
+
+/* ===== CONTAINER ===== */
+.treatment-container {
+  width: 100%;
+  padding: 24px;
+  background: #f9fafb;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* ✅ centers everything horizontally */
+}
+
+/* ===== TITLE ===== */
+.treatment-container h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 16px;
+
+  text-align: center;   /* ✅ centers text */
+  width: 100%;
+}
+
+/* ===== CARD ===== */
+.card {
+  width: 100%;
+  max-width: 640px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* ===== INPUT ===== */
+.card input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+/* ===== RESULTS ===== */
+.results {
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ===== RESULT ITEM ===== */
+.result-item {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.result-item:hover {
+  background: #f3f4f6;
+}
+
+.result-item strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.result-item span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ===== PATIENT INFO ===== */
+.patient-info {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+/* INFO ROW */
+.patient-info p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.patient-info p:last-child {
+  border-bottom: none;
+}
+
+/* LABEL */
+.patient-info strong {
+  color: #1e3a8a;
+}
+
+/* VALUE */
+.patient-info span {
+  color: #111827;
+  font-weight: 500;
+}
+
+/* ===== BUTTON ===== */
+.patient-info button {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.patient-info button:disabled {
+  background: #9ca3af;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+  .treatment-container {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .patient-info p {
+    flex-direction: column;
+    gap: 2px;
+  }
+}

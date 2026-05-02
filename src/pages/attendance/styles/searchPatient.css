@@ -1,0 +1,166 @@
+/* ===== ROOT ===== */
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --bg: #f9fafb;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+}
+
+/* ===== PAGE ===== */
+/* ===== PAGE ===== */
+.page-layout-vertical {
+  width: 100%;
+  min-height: 100%;
+  padding: 20px 30px;
+  background: #f4f6f9;
+
+  display: block; /* ❌ remove center layout */
+}
+
+/* ===== SEARCH ===== */
+.top-search {
+  width: 400px;
+  margin-bottom: 20px;
+}
+
+.top-search input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+/* ===== LIST ===== */
+.list-container {
+  width: 400px;
+}
+
+.card {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.card:hover {
+  background: #eef2ff;
+}
+
+/* ===== DETAIL LAYOUT (MAIN FIX) ===== */
+.detail-container {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 350px 1fr; /* 🔥 ERP split */
+  gap: 20px;
+  align-items: start;
+}
+
+/* ===== LEFT PANEL ===== */
+.detail-container > div:first-child {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.detail-container > div:last-child {
+  height: 100%;
+  max-height: 400px; /* 🔥 control height */
+  overflow-y: auto;  /* 🔥 scroll inside */
+}
+
+/* ===== RIGHT PANEL ===== */
+.detail-container > div:last-child {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+/* ===== BACK BUTTON ===== */
+.back-btn {
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+/* ===== TITLES ===== */
+h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #1e3a8a;
+}
+
+h3 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+/* ===== INFO TEXT ===== */
+.detail-container p {
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+/* ===== INPUTS ===== */
+textarea,
+input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+/* ===== BUTTON ===== */
+.detail-container button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.detail-container button:hover {
+  background: #1e40af;
+}
+
+/* ===== SESSION TABLE STYLE ===== */
+.session-card {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.session-card:last-child {
+  border-bottom: none;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+  .detail-container {
+    grid-template-columns: 1fr; /* stack */
+  }
+
+  .top-search,
+  .list-container {
+    width: 100%;
+  }
+
+  .page-layout-vertical {
+    padding: 14px;
+  }
+}

@@ -1,0 +1,94 @@
+/* ===== PAGE ===== */
+.page-layout-vertical {
+  width: 100%;
+  min-height: 100%;
+  padding: 20px 30px;
+  background: #f4f6f9;
+  font-family: "Inter", sans-serif;
+}
+
+/* ===== DETAIL CONTAINER ===== */
+.detail-container {
+  width: 100%;
+  max-width: 900px;
+
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  padding: 20px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 🔥 KEY FIX */
+  gap: 20px;
+}
+
+/* ===== FULL WIDTH ITEMS ===== */
+.detail-container h2,
+.detail-container .full {
+  grid-column: span 2;
+}
+
+/* ===== BACK BUTTON ===== */
+.back-btn {
+  grid-column: span 2;
+
+  width: fit-content;
+  padding: 6px 12px;
+
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+
+  cursor: pointer;
+}
+
+/* ===== TEXT ===== */
+.detail-container h2 {
+  font-size: 20px;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.detail-container p {
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+/* ===== INPUTS ===== */
+select,
+input {
+  width: 100%;
+  padding: 10px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+
+  font-size: 14px;
+}
+
+/* ===== BUTTON ===== */
+.detail-container button {
+  grid-column: span 2;
+
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.detail-container button:hover {
+  background: #1e40af;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .detail-container {
+    grid-template-columns: 1fr;
+  }
+}
