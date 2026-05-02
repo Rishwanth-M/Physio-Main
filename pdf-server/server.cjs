@@ -28,7 +28,11 @@ app.post("/generate-pdf", async (req, res) => {
   try {
     const data = req.body;
 
-    const browser = await puppeteer.launch({   args: ["--no-sandbox", "--disable-setuid-sandbox"],   headless: "new" });
+    const browser = await puppeteer.launch({
+  args: chromium.args,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless
+});
     const page = await browser.newPage();
 
     const html = generateHTML(data);
@@ -77,7 +81,11 @@ app.post("/register-and-generate-pdf", async (req, res) => {
     /* ---------- 2. GENERATE PDF ---------- */
     const html = generateHTML(data);
 
-    const browser = await puppeteer.launch({   args: ["--no-sandbox", "--disable-setuid-sandbox"],   headless: "new" });
+const browser = await puppeteer.launch({
+  args: chromium.args,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless
+});
     const page = await browser.newPage();
 
     await page.setContent(html, { waitUntil: "networkidle0" });
@@ -205,7 +213,11 @@ app.post("/generate-bill-pdf", async (req, res) => {
       totalCost
     });
 
-    const browser = await puppeteer.launch({   args: ["--no-sandbox", "--disable-setuid-sandbox"],   headless: "new" });
+    const browser = await puppeteer.launch({
+  args: chromium.args,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless
+});
     const page = await browser.newPage();
 
     await page.setContent(html, { waitUntil: "networkidle0" });
