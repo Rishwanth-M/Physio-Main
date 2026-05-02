@@ -57,7 +57,7 @@ export default function Bill() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/generate-bill-pdf", {
+      const res = awaitfetch("http://localhost:5000/generate-bill-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
