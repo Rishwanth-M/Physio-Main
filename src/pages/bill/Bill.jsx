@@ -57,7 +57,7 @@ export default function Bill() {
     try {
       setLoading(true);
 
-      const res = awaitfetch("http://localhost:5000/generate-bill-pdf", {
+      const res = await fetch("https://physio-main.onrender.com/generate-bill-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
