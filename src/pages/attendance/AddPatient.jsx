@@ -49,46 +49,49 @@ export default function AddPatient() {
 
   // 💾 Save Assignment
   const saveAssignment = async () => {
-    if (!selectedPatient || !selectedPhysio || !cost) {
-      alert("Please fill all fields");
-      return;
-    }
+  if (!selectedPatient || !selectedPhysio || !cost) {
+    alert("Please fill all fields");
+    return;
+  }
 
-    // 🔥 Prevent duplicate assignment
-    const { data: existing } = await supabase
-      .from("patient_assignments")
-      .select("*")
-      .eq("patient_id", selectedPatient.patient_id)
-      .maybeSingle();
+  // 🔍 Check ONLY active assignment
+  const { data: existing } = await supabase
+    .from("patient_assignments")
+    .select("*")
+    .eq("patient_id", selectedPatient.patient_id)
+    .eq("is_active", true)
+    .maybeSingle();
 
-    if (existing) {
-      alert("Patient already assigned ❌");
-      return;
-    }
+  if (existing) {
+    alert("Patient already under treatment ❌");
+    return;
+  }
 
-    const { error } = await supabase
-      .from("patient_assignments")
-      .insert({
-        patient_id: selectedPatient.patient_id,
-        physio_id: selectedPhysio,
-        cost_per_session: cost
-      });
+  // ✅ Insert new assignment
+  const { error } = await supabase
+    .from("patient_assignments")
+    .insert({
+      patient_id: selectedPatient.patient_id,
+      physio_id: selectedPhysio,
+      cost_per_session: cost,
+      is_active: true
+    });
 
-    if (error) {
-      console.error(error);
-      alert("Error saving assignment");
-      return;
-    }
+  if (error) {
+    console.error(error);
+    alert("Error saving assignment");
+    return;
+  }
 
-    alert("Assigned successfully ✅");
+  alert("Assigned successfully ✅");
 
-    // 🔄 Reset everything
-    setSelectedPatient(null);
-    setSearch("");
-    setPatients([]);
-    setSelectedPhysio("");
-    setCost("");
-  };
+  // RESET
+  setSelectedPatient(null);
+  setSearch("");
+  setPatients([]);
+  setSelectedPhysio("");
+  setCost("");
+};
 
   return (
     <div className="page-layout-vertical">
