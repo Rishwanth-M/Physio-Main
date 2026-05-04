@@ -1,8 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
-const puppeteer = require("puppeteer-core");
-const chromium = require("@sparticuz/chromium");
+const puppeteer = require("puppeteer");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
 
@@ -81,7 +80,7 @@ app.post("/register-and-generate-pdf", async (req, res) => {
     /* ---------- 2. GENERATE PDF ---------- */
     const html = generateHTML(data);
 
-const browser = await puppeteer.launch({
+    const browser = await puppeteer.launch({
   args: chromium.args,
   executablePath: await chromium.executablePath(),
   headless: chromium.headless
@@ -133,14 +132,19 @@ app.post("/generate-treatment-pdf", async (req, res) => {
     }
 
     /* ---------- 2. Fetch Sessions ---------- */
-    const { data: sessions } = await supabase
-      .from("sessions")
-      .select("*")
-      .eq("patient_id", patient_id)
-      .order("session_date", { ascending: true });
+    const { data: sessionsRaw } = await supabase
+  .from("sessions")
+  .select("*")
+  .eq("patient_id", patient_id)
+  .order("session_date", { ascending: true });
+
+// ✅ ALWAYS SAFE
+const sessions = sessionsRaw || [];
 
     /* ---------- 3. Fetch Physios ---------- */
-    const physioIds = [...new Set(sessions.map(s => s.physio_id))];
+    const physioIds = [
+  ...new Set(sessions.map(s => s.physio_id).filter(Boolean))
+];
 
     let physioMap = {};
 
@@ -150,7 +154,7 @@ app.post("/generate-treatment-pdf", async (req, res) => {
         .select("id, name, designation, phone")
         .in("id", physioIds);
 
-      physios.forEach(p => {
+      (physios || []).forEach(p => {
         physioMap[p.id] = {
           name: p.name,
           designation: p.designation,
@@ -243,8 +247,6 @@ app.post("/generate-bill-pdf", async (req, res) => {
 
 
 /* ================= SERVER ================= */
-const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
