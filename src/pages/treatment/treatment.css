@@ -8,6 +8,7 @@
 /* ===== CONTAINER ===== */
 .treatment-container {
   width: 100%;
+  min-height: 100%;
   padding: 24px;
 
   display: flex;
