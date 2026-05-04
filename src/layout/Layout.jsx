@@ -1,22 +1,32 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import "./layout.css";
+import {
+  FiHome,
+  FiUserPlus,
+  FiActivity,
+  FiFileText,
+  FiUsers,
+  FiCalendar,
+  FiUser,
+  FiPhone
+} from "react-icons/fi";
 
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
-  const menu = [
-    { name: "Dashboard", path: "/" },
-    { name: "Registration", path: "/registration" },
-    { name: "Treatment", path: "/treatment" },
-    { name: "Billing", path: "/bill" },
-    { name: "Admin", path: "/admin" },
-    { name: "Attendance", path: "/attendance" },
-    { name: "Physio", path: "/physio" },
-    { name: "Contact", path: "/contact-dev" },
-  ];
+const menu = [
+  { name: "Dashboard", path: "/", icon: <FiHome /> },
+  { name: "Registration", path: "/registration", icon: <FiUserPlus /> },
+  { name: "Treatment", path: "/treatment", icon: <FiActivity /> },
+  { name: "Billing", path: "/bill", icon: <FiFileText /> },
+  { name: "Admin", path: "/admin", icon: <FiUsers /> },
+  { name: "Attendance", path: "/attendance", icon: <FiCalendar /> },
+  { name: "Physio", path: "/physio", icon: <FiUser /> },
+  { name: "Contact", path: "/contact-dev", icon: <FiPhone /> },
+];
 
   const go = (path) => {
     navigate(path);
@@ -28,26 +38,26 @@ export default function Layout() {
 
       {/* MOBILE TOPBAR */}
       <div className="mobile-top">
-        <button onClick={() => setOpen(true)}>☰</button>
-        <h2>VR Physio</h2>
-      </div>
-
+  <button onClick={() => setOpen(true)}>☰</button>
+  <h2>VR Physio Rehab</h2>
+</div>
       {/* OVERLAY */}
       {open && <div className="overlay" onClick={() => setOpen(false)} />}
 
       {/* SIDEBAR */}
       <div className={`sidebar ${open ? "open" : ""}`}>
-        <div className="logo">VR</div>
+        <div className="logo">VR Physio Pvt. Ltd.</div>
 
         {menu.map((m) => (
-          <button
-            key={m.path}
-            onClick={() => go(m.path)}
-            className={location.pathname === m.path ? "active" : ""}
-          >
-            {m.name}
-          </button>
-        ))}
+  <button
+    key={m.path}
+    onClick={() => go(m.path)}
+    className={location.pathname === m.path ? "active" : ""}
+  >
+    {m.icon}
+    {m.name}
+  </button>
+))}
       </div>
 
       {/* MAIN */}
