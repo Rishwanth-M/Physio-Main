@@ -1,41 +1,61 @@
 require("dotenv").config();
 
 const express = require("express");
-const puppeteer = require("puppeteer-core");
-const chromium = require("@sparticuz/chromium");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
 
-// templates
-const generateHTML = require("./templates/index"); // registration
-const generateTreatmentHTML = require("./templates/treatmentTemplate");
-const generateBillHTML = require("./templates/billTemplate");
-
 const app = express();
-app.use(cors({
-  origin: "*"
-}));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Supabase
+// 🔥 ENV CHECK
+const isLocal = process.env.NODE_ENV !== "production";
+
+// 🔥 SUPABASE
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
-/* ================= GENERIC PDF (KEEP) ================= */
+// 🔥 TEMPLATES
+const generateHTML = require("./templates/index");
+const generateTreatmentHTML = require("./templates/treatmentTemplate");
+const generateBillHTML = require("./templates/billTemplate");
+
+
+// =======================================================
+// 🔥 UNIVERSAL BROWSER LAUNCH (LOCAL + RENDER)
+// =======================================================
+async function launchBrowser() {
+  if (isLocal) {
+    const puppeteer = require("puppeteer");
+
+    return await puppeteer.launch({
+      headless: true
+    });
+
+  } else {
+    const puppeteer = require("puppeteer-core");
+    const chromium = require("@sparticuz/chromium");
+
+    return await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true
+    });
+  }
+}
+
+
+// =======================================================
+// 🔥 GENERIC PDF
+// =======================================================
 app.post("/generate-pdf", async (req, res) => {
   try {
-    const data = req.body;
+    const html = generateHTML(req.body);
 
-    const browser = await puppeteer.launch({
-  args: chromium.args,
-  executablePath: await chromium.executablePath(),
-  headless: true
-});
+    const browser = await launchBrowser();
     const page = await browser.newPage();
-
-    const html = generateHTML(data);
 
     await page.setContent(html, { waitUntil: "domcontentloaded" });
 
@@ -56,12 +76,13 @@ app.post("/generate-pdf", async (req, res) => {
 });
 
 
-/* ================= 🔥 NEW: REGISTER + PDF ================= */
+// =======================================================
+// 🔥 REGISTER + PDF
+// =======================================================
 app.post("/register-and-generate-pdf", async (req, res) => {
   try {
     const data = req.body;
 
-    /* ---------- 1. SAVE TO SUPABASE ---------- */
     const { error } = await supabase
       .from("patients")
       .insert({
@@ -70,25 +91,17 @@ app.post("/register-and-generate-pdf", async (req, res) => {
         phone: data.mobile,
         email: data.email,
         diagnosed_with: data.diagnosedWith,
-        data: data // 🔥 JSONB FULL STORAGE
+        data: data
       });
 
-    if (error) {
-      console.error(error);
-      return res.status(500).send("Database Error");
-    }
+    if (error) return res.status(500).send("Database Error");
 
-    /* ---------- 2. GENERATE PDF ---------- */
     const html = generateHTML(data);
 
-    const browser = await puppeteer.launch({
-  args: chromium.args,
-  executablePath: await chromium.executablePath(),
-  headless: chromium.headless
-});
+    const browser = await launchBrowser();
     const page = await browser.newPage();
 
-    await page.setContent(html, { waitUntil: "networkidle0" });
+    await page.setContent(html, { waitUntil: "domcontentloaded" });
 
     const pdf = await page.pdf({
       format: "A4",
@@ -97,7 +110,6 @@ app.post("/register-and-generate-pdf", async (req, res) => {
 
     await browser.close();
 
-    /* ---------- 3. SEND PDF ---------- */
     res.set({
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=${data.patientId}.pdf`
@@ -112,40 +124,32 @@ app.post("/register-and-generate-pdf", async (req, res) => {
 });
 
 
-/* ================= TREATMENT PDF ================= */
+// =======================================================
+// 🔥 TREATMENT REPORT (HTML PRINT)
+// =======================================================
 app.post("/generate-treatment-pdf", async (req, res) => {
   try {
     const { patient_id } = req.body;
 
-    if (!patient_id) {
-      return res.status(400).send("patient_id required");
-    }
-
-    /* ---------- 1. Fetch Patient ---------- */
-    const { data: patient, error: pError } = await supabase
+    const { data: patient } = await supabase
       .from("patients")
       .select("*")
       .eq("patient_id", patient_id)
       .single();
 
-    if (pError || !patient) {
-      return res.status(404).send("Patient not found");
-    }
+    if (!patient) return res.status(404).send("Patient not found");
 
-    /* ---------- 2. Fetch Sessions ---------- */
     const { data: sessionsRaw } = await supabase
-  .from("sessions")
-  .select("*")
-  .eq("patient_id", patient_id)
-  .order("session_date", { ascending: true });
+      .from("sessions")
+      .select("*")
+      .eq("patient_id", patient_id)
+      .order("session_date", { ascending: true });
 
-// ✅ ALWAYS SAFE
-const sessions = sessionsRaw || [];
+    const sessions = sessionsRaw || [];
 
-    /* ---------- 3. Fetch Physios ---------- */
     const physioIds = [
-  ...new Set(sessions.map(s => s.physio_id).filter(Boolean))
-];
+      ...new Set(sessions.map(s => s.physio_id).filter(Boolean))
+    ];
 
     let physioMap = {};
 
@@ -156,21 +160,15 @@ const sessions = sessionsRaw || [];
         .in("id", physioIds);
 
       (physios || []).forEach(p => {
-        physioMap[p.id] = {
-          name: p.name,
-          designation: p.designation,
-          phone: p.phone
-        };
+        physioMap[p.id] = p;
       });
     }
 
-    /* ---------- 4. Total Cost ---------- */
     const totalCost = sessions.reduce(
       (sum, s) => sum + (s.cost || 0),
       0
     );
 
-    /* ---------- 5. Generate HTML ---------- */
     const html = generateTreatmentHTML({
       patient,
       sessions,
@@ -178,39 +176,42 @@ const sessions = sessionsRaw || [];
       physioMap
     });
 
-    /* ---------- ✅ SEND HTML (FOR PRINT) ---------- */
     res.setHeader("Content-Type", "text/html");
-    res.setHeader("Content-Disposition", "inline");
-
     res.send(html);
 
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error generating treatment report");
+    res.status(500).send("Treatment error");
   }
 });
 
+
+// =======================================================
+// 🔥 BILL PDF
+// =======================================================
 app.post("/generate-bill-pdf", async (req, res) => {
   try {
     const { patient_id } = req.body;
 
-    /* ---------- 1. FETCH PATIENT ---------- */
     const { data: patient } = await supabase
       .from("patients")
       .select("*")
       .eq("patient_id", patient_id)
       .single();
 
-    /* ---------- 2. FETCH SESSIONS ---------- */
-    const { data: sessions } = await supabase
+    const { data: sessionsRaw } = await supabase
       .from("sessions")
       .select("*")
       .eq("patient_id", patient_id);
 
-    const totalSessions = sessions.length;
-    const totalCost = sessions.reduce((sum, s) => sum + (s.cost || 0), 0);
+    const sessions = sessionsRaw || [];
 
-    /* ---------- 3. GENERATE HTML ---------- */
+    const totalSessions = sessions.length;
+    const totalCost = sessions.reduce(
+      (sum, s) => sum + (s.cost || 0),
+      0
+    );
+
     const html = generateBillHTML({
       patient,
       sessions,
@@ -218,14 +219,10 @@ app.post("/generate-bill-pdf", async (req, res) => {
       totalCost
     });
 
-    const browser = await puppeteer.launch({
-  args: chromium.args,
-  executablePath: await chromium.executablePath(),
-  headless: chromium.headless
-});
+    const browser = await launchBrowser();
     const page = await browser.newPage();
 
-    await page.setContent(html, { waitUntil: "networkidle0" });
+    await page.setContent(html, { waitUntil: "domcontentloaded" });
 
     const pdf = await page.pdf({
       format: "A4",
@@ -234,10 +231,7 @@ app.post("/generate-bill-pdf", async (req, res) => {
 
     await browser.close();
 
-    res.set({
-      "Content-Type": "application/pdf",
-    });
-
+    res.set({ "Content-Type": "application/pdf" });
     res.send(pdf);
 
   } catch (err) {
@@ -247,7 +241,9 @@ app.post("/generate-bill-pdf", async (req, res) => {
 });
 
 
-/* ================= SERVER ================= */
+// =======================================================
+// 🚀 SERVER
+// =======================================================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
