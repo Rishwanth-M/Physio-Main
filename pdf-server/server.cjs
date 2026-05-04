@@ -31,13 +31,13 @@ app.post("/generate-pdf", async (req, res) => {
     const browser = await puppeteer.launch({
   args: chromium.args,
   executablePath: await chromium.executablePath(),
-  headless: chromium.headless
+  headless: true
 });
     const page = await browser.newPage();
 
     const html = generateHTML(data);
 
-    await page.setContent(html, { waitUntil: "networkidle0" });
+    await page.setContent(html, { waitUntil: "domcontentloaded" });
 
     const pdf = await page.pdf({
       format: "A4",
@@ -248,6 +248,8 @@ app.post("/generate-bill-pdf", async (req, res) => {
 
 
 /* ================= SERVER ================= */
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
