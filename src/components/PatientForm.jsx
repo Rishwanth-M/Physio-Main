@@ -62,8 +62,8 @@ export default function PatientForm({ form, setForm }) {
 </div>
 
         <div className="row">
-          <input name="occupation" required placeholder="Occupation *" className="input" onChange={handleChange}/>
-          <input name="email" required placeholder="Email *" className="input" onChange={handleChange}/>
+          <input name="occupation" placeholder="Occupation *" className="input" onChange={handleChange}/>
+          <input name="email" placeholder="Email *" className="input" onChange={handleChange}/>
 
           <div className="radio-box">
             <label>Newsfeed?</label>
@@ -88,7 +88,7 @@ export default function PatientForm({ form, setForm }) {
 
         <div className="row">
           <input name="fatherName" required placeholder="Father Name *" className="input" onChange={handleChange}/>
-          <input name="fatherOccupation" required placeholder="Father Occupation *" className="input" onChange={handleChange}/>
+          <input name="fatherOccupation" placeholder="Father Occupation *" className="input" onChange={handleChange}/>
           <input name="fatherMobile" required placeholder="Father Mobile *" className="input" onChange={handleChange}/>
         </div>
 
@@ -172,9 +172,9 @@ export default function PatientForm({ form, setForm }) {
         <div className="section-title">Emergency Contact</div>
 
         <div className="row">
-          <input name="emergencyName" required placeholder="Name *" className="input" onChange={handleChange}/>
-          <input name="relationship" required placeholder="Relationship *" className="input" onChange={handleChange}/>
-          <input name="emergencyPhone" required placeholder="Phone *" className="input" onChange={handleChange}/>
+          <input name="emergencyName"  placeholder="Name *" className="input" onChange={handleChange}/>
+          <input name="relationship"  placeholder="Relationship *" className="input" onChange={handleChange}/>
+          <input name="emergencyPhone"  placeholder="Phone *" className="input" onChange={handleChange}/>
         </div>
       </div>
 
