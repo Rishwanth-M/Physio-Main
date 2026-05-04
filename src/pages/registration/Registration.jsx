@@ -35,7 +35,7 @@ export default function Registration() {   // 🔥 rename
       return;
     }
 
-    const res = await fetch("https://physio-main.onrender.com/generate-bill-pdf", {
+    const res = await fetch("https://physio-main.onrender.com/generate-pdf", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
