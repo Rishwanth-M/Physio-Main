@@ -22,9 +22,9 @@ const menu = [
   { name: "Registration", path: "/registration", icon: <FiUserPlus /> },
   { name: "Treatment", path: "/treatment", icon: <FiActivity /> },
   { name: "Billing", path: "/bill", icon: <FiFileText /> },
-  { name: "Admin", path: "/admin", icon: <FiUsers /> },
   { name: "Attendance", path: "/attendance", icon: <FiCalendar /> },
   { name: "Physio", path: "/physio", icon: <FiUser /> },
+  { name: "Admin", path: "/admin", icon: <FiUsers /> },
   { name: "Contact", path: "/contact-dev", icon: <FiPhone /> },
 ];
 
