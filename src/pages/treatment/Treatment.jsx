@@ -14,6 +14,7 @@ const Treatment = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [sessionData, setSessionData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [treatmentEnded, setTreatmentEnded] = useState(false);
 
   /* ================= SEARCH PATIENT ================= */
   const handleSearch = async (value) => {
@@ -35,27 +36,59 @@ const Treatment = () => {
 
   /* ================= SELECT PATIENT ================= */
   const handleSelectPatient = async (patient) => {
-    setSelectedPatient(patient);
-    setResults([]);
-    setQuery(patient.name);
+  setSelectedPatient(patient);
+  setResults([]);
+  setQuery(patient.name);
 
-    /* ---- fetch sessions ---- */
-    const { data: sessions } = await supabase
-      .from("sessions")
-      .select("*")
-      .eq("patient_id", patient.patient_id);
+  // ✅ Fetch sessions
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("patient_id", patient.patient_id);
 
-    const totalSessions = sessions.length;
-    const totalCost = sessions.reduce(
-      (sum, s) => sum + (s.cost || 0),
-      0
-    );
+  const totalSessions = sessions?.length || 0;
+  const totalCost = sessions?.reduce(
+  (sum, s) => sum + (s.cost || 0),
+  0
+) || 0;
 
-    setSessionData({
-      totalSessions,
-      totalCost
-    });
-  };
+  // ✅ Check assignment status
+  const { data: assignment } = await supabase
+    .from("patient_assignments")
+    .select("is_active")
+    .eq("patient_id", patient.patient_id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  setTreatmentEnded(!assignment); // if no active → already ended
+
+  setSessionData({
+    totalSessions,
+    totalCost
+  });
+};
+
+const handleEndTreatment = async () => {
+  if (!selectedPatient) return;
+
+  const confirmEnd = confirm("End this treatment?");
+  if (!confirmEnd) return;
+
+  const { error } = await supabase
+    .from("patient_assignments")
+    .update({ is_active: false })
+    .eq("patient_id", selectedPatient.patient_id)
+    .eq("is_active", true);
+
+  if (error) {
+    console.error(error);
+    alert("Error ending treatment");
+    return;
+  }
+
+  alert("Treatment ended ✅");
+  setTreatmentEnded(true);
+};
 
   /* ================= GENERATE PDF ================= */
   const handleGeneratePDF = async () => {
@@ -148,9 +181,29 @@ const Treatment = () => {
   <strong>Total Cost:</strong>
   <span>₹{sessionData.totalCost}</span>
 </p>
-            <button onClick={handleGeneratePDF} disabled={loading}>
-              {loading ? "Generating..." : "Print Treatment Report"}
-            </button>
+            {/* ACTIONS */}
+<div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+
+  {/* END TREATMENT BUTTON */}
+  {!treatmentEnded && (
+    <button onClick={handleEndTreatment}>
+      End Treatment
+    </button>
+  )}
+
+  {/* PRINT BUTTON */}
+  <button
+    onClick={handleGeneratePDF}
+    disabled={!treatmentEnded || loading}
+  >
+    {loading
+      ? "Generating..."
+      : treatmentEnded
+      ? "Print Treatment Report"
+      : "End treatment to print"}
+  </button>
+
+</div>
 
           </div>
         )}
