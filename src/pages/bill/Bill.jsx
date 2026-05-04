@@ -13,6 +13,7 @@ export default function Bill() {
   const [selected, setSelected] = useState(null);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
 
   /* 🔍 SEARCH */
   const handleSearch = async (value) => {
@@ -34,30 +35,58 @@ export default function Bill() {
 
   /* 👤 SELECT PATIENT */
   const handleSelect = async (patient) => {
-    setSelected(patient);
-    setQuery(patient.name);
-    setResults([]);
+  setSelected(patient);
+  setQuery(patient.name);
+  setResults([]);
 
-    const { data: sessions } = await supabase
-      .from("sessions")
-      .select("*")
-      .eq("patient_id", patient.patient_id);
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("patient_id", patient.patient_id);
 
-    const totalSessions = sessions.length;
-    const totalCost = sessions.reduce(
-      (sum, s) => sum + (s.cost || 0),
-      0
-    );
+  const totalSessions = sessions?.length || 0;
+  const totalCost =
+    sessions?.reduce((sum, s) => sum + (s.cost || 0), 0) || 0;
 
-    setSummary({ totalSessions, totalCost });
-  };
+  // 🔥 CHECK PAYMENT STATUS
+  const { data: assignment } = await supabase
+    .from("patient_assignments")
+    .select("is_paid")
+    .eq("patient_id", patient.patient_id)
+    .maybeSingle();
+
+  setIsPaid(assignment?.is_paid || false);
+
+  setSummary({ totalSessions, totalCost });
+};
+
+const handleMarkPaid = async () => {
+  if (!selected) return;
+
+  const confirmPay = confirm("Mark this bill as paid?");
+  if (!confirmPay) return;
+
+  const { error } = await supabase
+    .from("patient_assignments")
+    .update({ is_paid: true })
+    .eq("patient_id", selected.patient_id)
+
+  if (error) {
+    console.error(error);
+    alert("Error updating payment");
+    return;
+  }
+
+  alert("Payment marked as completed ✅");
+  setIsPaid(true);
+};
 
   /* 🖨 PRINT */
   const handlePrint = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch("https://physio-main.onrender.com/generate-bill-pdf", {
+      const res = await fetch("http://localhost:5000/generate-bill-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -138,13 +167,29 @@ export default function Bill() {
               <span className="bill-value">₹{summary.totalCost}</span>
             </div>
 
-            <button
-              className="bill-btn"
-              onClick={handlePrint}
-              disabled={loading}
-            >
-              {loading ? "Generating..." : "Print Receipt"}
-            </button>
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+
+  {/* MARK AS PAID */}
+  {!isPaid && (
+    <button onClick={handleMarkPaid}>
+      Mark as Paid
+    </button>
+  )}
+
+  {/* PRINT BUTTON */}
+  <button
+    className="bill-btn"
+    onClick={handlePrint}
+    disabled={!isPaid || loading}
+  >
+    {loading
+      ? "Generating..."
+      : isPaid
+      ? "Print Receipt"
+      : "Mark as paid to print"}
+  </button>
+
+</div>
 
           </div>
         )}
